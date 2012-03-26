@@ -134,6 +134,7 @@
 #include "pm-boot.h"
 #include "board-storage-common-a.h"
 #include <mach/board_htc.h>
+#include <linux/msm_tsens.h>
 
 #include <linux/ion.h>
 #include <mach/ion.h>
@@ -3781,10 +3782,19 @@ static struct platform_device *early_devices[] __initdata = {
 	&msm_device_dmov_adm1,
 };
 
+#ifdef CONFIG_THERMAL_TSENS8X60
+static struct tsens_platform_data vc2_tsens_pdata  = {
+		.tsens_factor		= 1000,
+		.hw_type		= MSM_8660,
+		.tsens_num_sensor	= 6,
+		.slope 			= 702,
+};
+#else
 static struct platform_device msm_tsens_device = {
 	.name   = "tsens-tm",
 	.id = -1,
 };
+#endif
 
 #if defined(CONFIG_GPIO_SX150X) || defined(CONFIG_GPIO_SX150X_MODULE)
 enum {
@@ -5027,7 +5037,9 @@ static struct platform_device *villec2_devices[] __initdata = {
 #ifdef CONFIG_LEDS_PM8058
 	&pm8058_leds,
 #endif
+#ifndef CONFIG_THERMAL_TSENS8X60
 	&msm_tsens_device,
+#endif
 	&cable_detect_device,
 	&msm8660_rpm_device,
 #ifdef CONFIG_ION_MSM
@@ -9319,7 +9331,10 @@ static void __init msm8x60_init(struct msm_board_data *board_data)
 
 	msm8x60_check_2d_hardware();
 
-	
+#ifdef CONFIG_THERMAL_TSENS8X60
+	msm_tsens_early_init(&vc2_tsens_pdata);
+#endif
+
 	soc_platform_version = socinfo_get_platform_version();
 	if (SOCINFO_VERSION_MAJOR(soc_platform_version) == 1 &&
 			SOCINFO_VERSION_MINOR(soc_platform_version) >= 2) {
