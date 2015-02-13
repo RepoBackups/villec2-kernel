@@ -991,6 +991,12 @@ config TOUCHSCREEN_FT5X06
          To compile this driver as a module, choose M here: the
          module will be called ft5x06_ts.
 
+config TOUCHSCREEN_CYPRESS_SWEEP2WAKE
+        tristate "Sweep2Wake for Cypress CS touchscreens"
+        depends on TOUCHSCREEN_CYPRESS_CS
+        default n
+
+
 config TOUCHSCREEN_SYNAPTICS_3K
 	tristate "Synaptics 3k serious i2c touchscreen"
 	depends on I2C
